@@ -30,7 +30,7 @@ abstract class EspCommandModel<T> {
   String get command => '$_name:$_value';
 }
 
-class ServoCommandModel extends EspCommandModel<double> {
+class ServoCommandModel extends EspCommandModel<int> {
   ServoCommandModel(super.elementName, super.value);
 
   @override

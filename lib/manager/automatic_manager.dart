@@ -1,5 +1,6 @@
-import '../data/esp_command_model.dart';
+import 'package:esp_arm_controller_flutter/manager/websocket_manager.dart';
 
+import '../data/esp_command_model.dart';
 
 class AutomaticManager {
   static final AutomaticManager _instance = AutomaticManager._internal();
@@ -30,9 +31,8 @@ class AutomaticManager {
   }
 
   void executeCommands() {
-    print('Executing commands:');
-    for (var command in _commands) {
-      print(command.command);
-    }
+    String commandsString = _commands.map((cmd) => cmd.command).join(',');
+    WebSocketManager().send(commandsString);
+    print('Executing commands: $commandsString');
   }
 }

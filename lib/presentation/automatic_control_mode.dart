@@ -1,6 +1,7 @@
 import 'package:esp_arm_controller_flutter/data/esp_command_model.dart';
-import 'package:esp_arm_controller_flutter/main.dart';
 import 'package:flutter/material.dart';
+
+import '../app.dart';
 
 class AutomaticControlMode extends StatefulWidget {
   const AutomaticControlMode({super.key});
@@ -10,6 +11,36 @@ class AutomaticControlMode extends StatefulWidget {
 }
 
 class _AutomaticControlModeState extends State<AutomaticControlMode> {
+  @override
+  void initState() {
+    super.initState();
+    ws.stream.listen(
+      (event) {
+        setState(() {
+          consoleText += event.toString();
+        });
+        print('Received: $consoleText');
+
+        if (event.toString().startsWith('ESP:OK')) {
+          consoleText += 'app: command executed successfully\n';
+          setState(() {
+            automaticManager.clearCommands();
+          });
+        } else if (event.toString().startsWith('ESP:ERR')) {
+          consoleText += 'app: command execution failed\n';
+        } else {
+          consoleText += 'app: unknown response\n';
+        }
+      },
+      onError: (error) {
+        print('Error: $error');
+      },
+      onDone: () {
+        print('WebSocket closed');
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -304,10 +335,7 @@ class _AddCommandWidgetState extends State<AddCommandWidget> {
               TextButton(
                 onPressed: () {
                   widget.onAddCommand(
-                    ServoCommandModel(
-                      selectedServo.name,
-                      servoAngle.toInt().toDouble(),
-                    ),
+                    ServoCommandModel(selectedServo.name, servoAngle.toInt()),
                   );
                 },
                 child: Text(
